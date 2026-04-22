@@ -1,0 +1,14 @@
+{
+  "name": "react-rescuer-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter playground dev",
+    "build": "pnpm --filter react-rescuer build",
+    "test": "pnpm --filter react-rescuer test",
+    "lint": "biome check .",
+    "format": "biome format --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.0"
+  }
+}
