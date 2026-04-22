@@ -1,0 +1,75 @@
+{
+  "name": "react-rescuer",
+  "version": "0.1.0",
+  "description": "Smart React error boundaries with recovery, observability, and DX",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js",
+      "require": "./dist/hooks.cjs"
+    },
+    "./hoc": {
+      "types": "./dist/hoc.d.ts",
+      "import": "./dist/hoc.js",
+      "require": "./dist/hoc.cjs"
+    },
+    "./observability": {
+      "types": "./dist/observability.d.ts",
+      "import": "./dist/observability.js",
+      "require": "./dist/observability.cjs"
+    },
+    "./recovery": {
+      "types": "./dist/recovery.d.ts",
+      "import": "./dist/recovery.js",
+      "require": "./dist/recovery.cjs"
+    },
+    "./reporters/sentry": {
+      "types": "./dist/reporters/sentry.d.ts",
+      "import": "./dist/reporters/sentry.js",
+      "require": "./dist/reporters/sentry.cjs"
+    },
+    "./testing": {
+      "types": "./dist/testing.d.ts",
+      "import": "./dist/testing.js",
+      "require": "./dist/testing.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.0.0",
+    "jsdom": "^25.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0"
+  },
+  "keywords": [
+    "react",
+    "error-boundary",
+    "errors",
+    "recovery",
+    "observability"
+  ],
+  "license": "MIT"
+}
