@@ -2,6 +2,19 @@
   "name": "react-rescuer",
   "version": "0.1.0",
   "description": "Smart React error boundaries with recovery, observability, and DX",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rody-huancas/react-rescuer.git",
+    "directory": "packages/lib"
+  },
+  "bugs": {
+    "url": "https://github.com/rody-huancas/react-rescuer/issues"
+  },
+  "homepage": "https://github.com/rody-huancas/react-rescuer#readme",
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "exports": {
     ".": {
@@ -28,11 +41,6 @@
       "types": "./dist/recovery.d.ts",
       "import": "./dist/recovery.js",
       "require": "./dist/recovery.cjs"
-    },
-    "./reporters/sentry": {
-      "types": "./dist/reporters/sentry.d.ts",
-      "import": "./dist/reporters/sentry.js",
-      "require": "./dist/reporters/sentry.cjs"
     },
     "./testing": {
       "types": "./dist/testing.d.ts",
@@ -71,5 +79,5 @@
     "recovery",
     "observability"
   ],
-  "license": "MIT"
+  "sideEffects": false
 }
