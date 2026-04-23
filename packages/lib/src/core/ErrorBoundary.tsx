@@ -157,7 +157,6 @@ export class ErrorBoundary<E extends Error = Error> extends React.Component<
     this.setState({ error, errorInfo, errorContext, errorCount });
 
     this.props.onError?.(error, errorInfo, errorContext);
-    this.props.reporter?.report(errorContext);
   }
 
   private reset(reason: ResetReason) {

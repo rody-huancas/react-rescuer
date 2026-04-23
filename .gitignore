@@ -3,6 +3,7 @@ dist
 .turbo
 coverage
 *.local
+*.tgz
 
 AGENTS.md
 CONTRIBUTING.md

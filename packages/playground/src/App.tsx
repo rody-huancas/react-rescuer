@@ -1,68 +1,107 @@
 import { useMemo, useState } from "react";
-import { HookExample } from "./examples/HookExample";
-import { BasicExample } from "./examples/BasicExample";
-import { RetryExample } from "./examples/RetryExample";
-import { ObservabilityExample } from "./examples/ObservabilityExample";
+import { demos, type DemoKey } from "./demos";
+import { Brand, Button, DesktopOnly, Divider, Main, MobileOnly, NavButton, NavDesc, NavMeta, NavTitle, Page, Pills, Pill, Row, Select, Shell, Sidebar, Stack, Tagline, Wordmark } from "./ui/primitives";
 
-type DemoKey = "basic" | "retry" | "hook" | "observability";
-
-export function App() {
+export const App = () => {
   const [demo, setDemo] = useState<DemoKey>("basic");
 
-  const Demo = useMemo(() => {
-    switch (demo) {
-      case "basic":
-        return BasicExample;
-      case "retry":
-        return RetryExample;
-      case "hook":
-        return HookExample;
-      case "observability":
-        return ObservabilityExample;
-      default:
-        return BasicExample;
-    }
-  }, [demo]);
+  const active = useMemo(
+    () => demos.find((d) => d.key === demo) ?? demos[0]!,
+    [demo],
+  );
 
   return (
-    <div
-      style={{
-        fontFamily: "system-ui, -apple-system, Segoe UI, sans-serif",
-        padding: 24,
-        maxWidth: 900,
-        margin: "0 auto",
-      }}
-    >
-      <h1 style={{ margin: 0, fontSize: 20 }}>react-rescuer playground</h1>
-      <p style={{ marginTop: 8, color: "#4b5563" }}>
-        Manual examples for core features.
-      </p>
+    <Page>
+      <Shell>
+        <Sidebar>
+          <Stack $gap={12}>
+            <Brand>
+              <Wordmark>react-rescuer</Wordmark>
+              <Tagline>playground</Tagline>
+            </Brand>
 
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginTop: 16 }}>
-        <button type="button" onClick={() => setDemo("basic")}>
-          Basic
-        </button>
-        <button type="button" onClick={() => setDemo("retry")}>
-          Retry
-        </button>
-        <button type="button" onClick={() => setDemo("hook")}>
-          Hook
-        </button>
-        <button type="button" onClick={() => setDemo("observability")}>
-          Observability
-        </button>
-      </div>
+            <div>
+              <Tagline>
+                Hands-on demos for the ErrorBoundary core, hooks, recovery, and
+                observability.
+              </Tagline>
+            </div>
 
-      <div
-        style={{
-          marginTop: 16,
-          padding: 16,
-          border: "1px solid #e5e7eb",
-          borderRadius: 12,
-        }}
-      >
-        <Demo />
-      </div>
-    </div>
+            <MobileOnly>
+              <Select
+                value={demo}
+                onChange={(e) => setDemo(e.target.value as DemoKey)}
+              >
+                {demos.map((d) => (
+                  <option key={d.key} value={d.key}>
+                    {d.title}
+                  </option>
+                ))}
+              </Select>
+            </MobileOnly>
+
+            <Divider />
+
+            <DesktopOnly>
+              <Stack $gap={8}>
+                {demos.map((d) => (
+                  <NavButton
+                    key={d.key}
+                    type="button"
+                    $active={d.key === demo}
+                    onClick={() => setDemo(d.key)}
+                  >
+                    <NavMeta>
+                      <NavTitle>{d.title}</NavTitle>
+                      <NavDesc>{d.description}</NavDesc>
+                    </NavMeta>
+                    <Pills>
+                      {d.pills.slice(0, 2).map((p) => (
+                        <Pill key={p}>{p}</Pill>
+                      ))}
+                    </Pills>
+                  </NavButton>
+                ))}
+              </Stack>
+            </DesktopOnly>
+
+            <Divider />
+
+            <Row $gap={10}>
+              <Button
+                type="button"
+                $variant="ghost"
+                onClick={() => {
+                  window.open(
+                    "https://github.com/rody-huancas/react-rescuer",
+                    "_blank",
+                    "noopener,noreferrer",
+                  );
+                }}
+              >
+                Repo
+              </Button>
+              <Button
+                type="button"
+                $variant="ghost"
+                onClick={() => {
+                  window.open(
+                    "https://www.npmjs.com/package/react-rescuer",
+                    "_blank",
+                    "noopener,noreferrer",
+                  );
+                }}
+              >
+                npm
+              </Button>
+            </Row>
+          </Stack>
+        </Sidebar>
+
+        <Main>
+          <active.Component />
+        </Main>
+      </Shell>
+    </Page>
   );
-}
+};

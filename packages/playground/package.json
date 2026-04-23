@@ -8,7 +8,8 @@
   "dependencies": {
     "react-rescuer": "workspace:*",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "styled-components": "^6.1.19"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.0.0",
