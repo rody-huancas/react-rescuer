@@ -35,10 +35,6 @@ export type RecoveryStrategy<E extends Error = Error> = {
   onMaxRetriesReached?: (error: E, context: ErrorContext) => void;
 };
 
-export type ErrorReporter = {
-  report: (context: ErrorContext) => void;
-};
-
 export type ResetReason = "imperative" | "resetKeys" | "retry";
 
 export type ErrorBoundaryProps<E extends Error = Error> = {
@@ -59,7 +55,6 @@ export type ErrorBoundaryProps<E extends Error = Error> = {
   ) => void;
   onReset?: (details: { reason: ResetReason }) => void;
 
-  reporter?: ErrorReporter;
   recovery?: RecoveryStrategy<E>;
 
   getBreadcrumbs?: () => Breadcrumb[];
