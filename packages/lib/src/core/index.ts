@@ -5,7 +5,6 @@ export type {
   ErrorBoundaryLevel,
   ErrorBoundaryProps,
   ErrorContext,
-  ErrorReporter,
   FallbackProps,
   RecoveryStrategy,
   ResetReason,
