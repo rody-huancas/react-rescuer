@@ -1,47 +1,53 @@
 import { useState } from "react";
 import { ErrorBoundary } from "react-rescuer";
+import { ExampleShell } from "../ui/ExampleShell";
+import { Button, Callout, Row, Small, Stack } from "../ui/primitives";
 
-function Bomb({ armed }: { armed: boolean }) {
+const Bomb = ({ armed }: { armed: boolean }) => {
   if (armed) throw new Error("BasicExample explosion");
   return <div>All good.</div>;
-}
+};
 
-export function BasicExample() {
+export const BasicExample = () => {
   const [armed, setArmed] = useState(false);
   return (
-    <div>
-      <h2 style={{ margin: 0, fontSize: 16 }}>Basic ErrorBoundary</h2>
-      <p style={{ marginTop: 8, color: "#4b5563" }}>
-        Click to throw, then reset by changing resetKeys.
-      </p>
+    <ExampleShell
+      title="Basic ErrorBoundary"
+      lead="A minimal boundary using fallbackRender, plus automatic reset via resetKeys."
+      imports={`import { ErrorBoundary } from "react-rescuer";`}
+      api={[
+        { name: "fallbackRender", detail: "render prop fallback; receives error + errorContext." },
+        { name: "resetKeys", detail: "when this array changes, the boundary resets automatically." }
+      ]}
+      tryIt={["Click Throw to crash the subtree.", "Click Reset to flip resetKeys and recover."]}
+    >
+      <Stack $gap={12}>
+        <Row>
+          <Button type="button" $variant="primary" onClick={() => setArmed(true)}>
+            Throw
+          </Button>
+          <Button type="button" $variant="ghost" onClick={() => setArmed(false)}>
+            Reset
+          </Button>
+          <Small>armed: {String(armed)}</Small>
+        </Row>
 
-      <button type="button" onClick={() => setArmed(true)}>
-        Throw
-      </button>
-      <button
-        type="button"
-        onClick={() => setArmed(false)}
-        style={{ marginLeft: 8 }}
-      >
-        Reset
-      </button>
-
-      <div style={{ marginTop: 12 }}>
         <ErrorBoundary
           resetKeys={[armed]}
           fallbackRender={({ error, errorContext }) => (
-            <div>
-              <div style={{ fontWeight: 700 }}>Caught:</div>
-              <div>{error.message}</div>
-              <div style={{ fontSize: 12, color: "#6b7280" }}>
-                fingerprint: {errorContext.fingerprint}
-              </div>
-            </div>
+            <Callout $tone="danger">
+              <Stack $gap={6}>
+                <div>
+                  <strong>Caught:</strong> {error.message}
+                </div>
+                <Small>fingerprint: {errorContext.fingerprint}</Small>
+              </Stack>
+            </Callout>
           )}
         >
           <Bomb armed={armed} />
         </ErrorBoundary>
-      </div>
-    </div>
+      </Stack>
+    </ExampleShell>
   );
-}
+};
