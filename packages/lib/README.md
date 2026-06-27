@@ -232,10 +232,6 @@ import { RetryManager, createExponentialBackoff } from "react-rescuer/recovery";
 import { addBreadcrumb, buildErrorContext, fingerprintError, getBreadcrumbTrail } from "react-rescuer/observability";
 ```
 
-## Documentation
-
-Full API reference and advanced recipes → [DOCUMENTATION.md](https://github.com/rody-huancas/react-rescuer/blob/main/DOCUMENTATION.md)
-
 ## Contributing
 
 Issues and PRs welcome. See the [repository](https://github.com/rody-huancas/react-rescuer) for setup instructions.
