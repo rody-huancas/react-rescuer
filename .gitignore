@@ -6,4 +6,6 @@ coverage
 *.tgz
 
 AGENTS.md
+CLAUDE.md
 CONTRIBUTING.md
+DOCUMENTATION.md

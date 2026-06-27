@@ -1,8 +1,12 @@
 {
   "name": "react-rescuer",
-  "version": "0.1.1",
-  "description": "Smart React error boundaries with recovery, observability, and DX",
+  "version": "0.1.2",
+  "description": "React error boundaries with automatic recovery, observability, breadcrumbs, and DevOverlay",
   "license": "MIT",
+  "author": {
+    "name": "Rody Huancas",
+    "url": "https://github.com/rody-huancas"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/rody-huancas/react-rescuer.git",
@@ -12,40 +16,56 @@
     "url": "https://github.com/rody-huancas/react-rescuer/issues"
   },
   "homepage": "https://github.com/rody-huancas/react-rescuer#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
     "dist"
   ],
   "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
     },
     "./hooks": {
       "types": "./dist/hooks.d.ts",
       "import": "./dist/hooks.js",
-      "require": "./dist/hooks.cjs"
+      "require": "./dist/hooks.cjs",
+      "default": "./dist/hooks.js"
     },
     "./hoc": {
       "types": "./dist/hoc.d.ts",
       "import": "./dist/hoc.js",
-      "require": "./dist/hoc.cjs"
+      "require": "./dist/hoc.cjs",
+      "default": "./dist/hoc.js"
     },
     "./observability": {
       "types": "./dist/observability.d.ts",
       "import": "./dist/observability.js",
-      "require": "./dist/observability.cjs"
+      "require": "./dist/observability.cjs",
+      "default": "./dist/observability.js"
     },
     "./recovery": {
       "types": "./dist/recovery.d.ts",
       "import": "./dist/recovery.js",
-      "require": "./dist/recovery.cjs"
+      "require": "./dist/recovery.cjs",
+      "default": "./dist/recovery.js"
     },
     "./testing": {
       "types": "./dist/testing.d.ts",
       "import": "./dist/testing.js",
-      "require": "./dist/testing.cjs"
+      "require": "./dist/testing.cjs",
+      "default": "./dist/testing.js"
     }
   },
   "scripts": {
@@ -75,9 +95,24 @@
   "keywords": [
     "react",
     "error-boundary",
+    "error-boundaries",
     "errors",
+    "error-handling",
     "recovery",
-    "observability"
+    "retry",
+    "backoff",
+    "observability",
+    "breadcrumbs",
+    "fingerprint",
+    "monitoring",
+    "devoverlay",
+    "fallback",
+    "typescript",
+    "react18"
   ],
-  "sideEffects": false
+  "sideEffects": false,
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/rody-huancas"
+  }
 }
