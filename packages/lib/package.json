@@ -1,6 +1,6 @@
 {
   "name": "react-rescuer",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "React error boundaries with automatic recovery, observability, breadcrumbs, and DevOverlay",
   "license": "MIT",
   "author": {
