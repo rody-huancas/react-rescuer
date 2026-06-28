@@ -1,251 +1,241 @@
-<p align="center">
+# react-rescuer
+
+<p>
   <a href="https://github.com/rody-huancas/react-rescuer">
-    <img src="packages/playground/public/logo-react-rescuer.webp" alt="react-rescuer" width="520" />
+    <img src="https://raw.githubusercontent.com/rody-huancas/react-rescuer/develop/packages/playground/public/logo-react-rescuer.webp" alt="react-rescuer" width="520" />
   </a>
 </p>
 
-# react-rescuer
+**Error boundaries for React 18 — with automatic recovery, observability, and zero config DevOverlay.**
 
+[![npm](https://img.shields.io/npm/v/react-rescuer)](https://www.npmjs.com/package/react-rescuer)
 [![CI](https://img.shields.io/github/actions/workflow/status/rody-huancas/react-rescuer/ci.yml?branch=develop)](https://github.com/rody-huancas/react-rescuer/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/rody-huancas/react-rescuer/blob/main/LICENSE)
 
-Smart React error boundaries with recovery, observability, and DX.
+## Why react-rescuer?
 
-Links:
-
-- Repository: https://github.com/rody-huancas/react-rescuer
-- Author: https://github.com/rody-huancas
-
-If this project helps you, consider starring the repo:
-
-- https://github.com/rody-huancas/react-rescuer/stargazers
-
----
-
-## Monorepo
-
-This repo is a pnpm workspace:
-
-- `packages/lib` - the published npm package: `react-rescuer`
-- `packages/playground` - a Vite + React app for manual testing
-
----
+React's built-in error boundaries catch render errors — and that's it. react-rescuer adds automatic retry with backoff, structured observability (breadcrumbs, fingerprinting, session tracking), a zero-config DevOverlay in development, and testing utilities. All opt-in, zero config to start.
 
 ## Install
 
 ```bash
-pnpm add react-rescuer
+npm i react-rescuer
+# pnpm add react-rescuer  |  yarn add react-rescuer  |  bun add react-rescuer
 ```
 
-Peer deps:
-
-- `react` >= 18
-- `react-dom` >= 18
-
----
+Peer deps: `react >= 18`, `react-dom >= 18`
 
 ## Quick start
 
 ```tsx
 import { ErrorBoundary } from "react-rescuer";
 
-export const App = () => (
-  <ErrorBoundary fallback={<div>Something went wrong.</div>}>
-    <Page />
-  </ErrorBoundary>
-);
-```
-
-Want the error details and a reset button?
-
-```tsx
-import { ErrorBoundary } from "react-rescuer";
-
-export const App = () => (
-  <ErrorBoundary
-    fallbackRender={({ error, resetError, retryCount }) => (
-      <div>
-        <div>{error.message}</div>
-        <div>retryCount: {retryCount}</div>
-        <button type="button" onClick={resetError}>
-          Retry
-        </button>
-      </div>
-    )}
-  >
-    <Page />
-  </ErrorBoundary>
-);
-```
-
----
-
-## Usage patterns
-
-<details>
-  <summary><strong>1) Automatic reset with resetKeys</strong></summary>
-
-`resetKeys` works like in react-error-boundary: when the array changes, the boundary resets.
-
-```tsx
-import { useState } from "react";
-import { ErrorBoundary } from "react-rescuer";
-
-const Bomb = ({ armed }: { armed: boolean }) => {
-  if (armed) throw new Error("boom");
-  return <div>OK</div>;
-};
-
-export const Demo = () => {
-  const [armed, setArmed] = useState(false);
-
+export function App() {
   return (
-    <div>
-      <button type="button" onClick={() => setArmed(true)}>Throw</button>
-      <button type="button" onClick={() => setArmed(false)}>Reset</button>
-
-      <ErrorBoundary resetKeys={[armed]} fallback={<div>Fallback</div>}>
-        <Bomb armed={armed} />
-      </ErrorBoundary>
-    </div>
+    <ErrorBoundary fallback={<p>Something went wrong.</p>}>
+      <Page />
+    </ErrorBoundary>
   );
+}
+```
+
+That's it for the happy path. Everything below is opt-in.
+
+## Features
+
+### Fallback UI
+
+Three modes — pick the one that fits:
+
+```tsx
+// static node
+<ErrorBoundary fallback={<p>Error</p>}>
+
+// render prop — access error + reset
+<ErrorBoundary fallbackRender={({ error, resetError }) => (
+  <div>
+    <p>{error.message}</p>
+    <button onClick={resetError}>Retry</button>
+  </div>
+)}>
+
+// component
+<ErrorBoundary FallbackComponent={MyFallback}>
+```
+
+`FallbackProps` received by `fallbackRender` / `FallbackComponent`:
+
+```ts
+type FallbackProps = {
+  error: Error;
+  errorContext: ErrorContext; // fingerprint, breadcrumbs, sessionId, …
+  resetError: () => void;
+  retryCount: number;
 };
 ```
 
-</details>
+### Automatic recovery
 
-<details>
-  <summary><strong>2) Errors from events / async code (useErrorBoundary)</strong></summary>
-
-Boundaries catch render-time errors. For event handlers (click, async, promises), use `useErrorBoundary()`.
+Pass a `recovery` prop to retry automatically with exponential backoff:
 
 ```tsx
 import { ErrorBoundary } from "react-rescuer";
-import { useErrorBoundary } from "react-rescuer/hooks";
 
-const Raise = () => {
-  const { showBoundary } = useErrorBoundary();
-
-  return (
-    <button type="button" onClick={() => showBoundary(new Error("from a handler"))}>
-      Throw via hook
-    </button>
-  );
-};
-
-export const Demo = () => (
-  <ErrorBoundary fallback={<div>Fallback: caught via hook</div>}>
-    <Raise />
-  </ErrorBoundary>
-);
+<ErrorBoundary
+  recovery={{
+    maxRetries: 3,
+    retryDelay: (attempt) => Math.min(8000, 250 * 2 ** (attempt - 1)), // 250 → 500 → 1000 …
+    isRecoverable: (error) => error.name !== "FatalError",
+    onMaxRetriesReached: (error, ctx) => reportToSentry(error, ctx),
+  }}
+  fallbackRender={({ error, retryCount }) => (
+    <p>
+      {error.message} — attempt {retryCount}
+    </p>
+  )}
+>
+  <DataWidget />
+</ErrorBoundary>;
 ```
 
-</details>
+For orchestrating retries across multiple boundaries, use `RetryManager` from `react-rescuer/recovery`:
 
-<details>
-  <summary><strong>3) Observability (contextBuilder + breadcrumbs)</strong></summary>
+```ts
+import { RetryManager, createExponentialBackoff } from "react-rescuer/recovery";
 
-Opt in by injecting `contextBuilder={buildErrorContext}`.
+const manager = new RetryManager(
+  { maxRetries: 5 },
+  createExponentialBackoff(250, 10_000),
+);
+
+const { ok, delayMs } = manager.next("widget-boundary", error, context);
+```
+
+### Observability
+
+Every error gives you a structured `ErrorContext` out of the box:
+
+```ts
+type ErrorContext = {
+  error: Error;
+  fingerprint: string; // stable hash across deploys
+  breadcrumbs: Breadcrumb[]; // last 20 user actions before the crash
+  componentStack: string;
+  sessionId: string;
+  errorCount: number;
+  timestamp: number;
+};
+```
+
+Auto-capture clicks and navigation events, then attach them to the boundary:
 
 ```tsx
 import { ErrorBoundary } from "react-rescuer";
 import { addBreadcrumb, buildErrorContext } from "react-rescuer/observability";
 
-export const Demo = () => (
-  <ErrorBoundary
-    contextBuilder={buildErrorContext}
-    onError={(error, _info, ctx) => {
-      // ctx includes fingerprint, breadcrumbs, componentStack, sessionId, etc.
-      console.log("ErrorContext", { error, ctx });
-    }}
-    fallback={<div>Check the console</div>}
-  >
-    <button
-      type="button"
-      onClick={() => {
-        addBreadcrumb({ type: "custom", message: "user clicked" });
-        // For event errors: use showBoundary() (see the hook example).
-      }}
-    >
-      Add breadcrumb
-    </button>
-  </ErrorBoundary>
-);
+// manually add a breadcrumb anywhere in your app
+addBreadcrumb({ type: "custom", message: "user submitted form" });
+
+<ErrorBoundary
+  contextBuilder={buildErrorContext}
+  onError={(error, _info, ctx) => {
+    sendToMonitoring({ error, ctx }); // fingerprint + breadcrumbs included
+  }}
+  fallback={<p>Something went wrong.</p>}
+>
+  <CheckoutForm />
+</ErrorBoundary>;
 ```
 
-</details>
+`getBreadcrumbTrail()` auto-starts on first call and captures `click`, `pushState`, `replaceState`, and `popstate`. Breadcrumbs clear on boundary reset.
 
-<details>
-  <summary><strong>4) Recovery / retries</strong></summary>
+### DevOverlay
 
-Provide a recovery strategy via `recovery`.
+In `development`, `ErrorBoundary` automatically renders a built-in overlay with the error, stack, component tree, retries left, and breadcrumbs. No setup needed — it tree-shakes to zero in production.
+
+### Async errors
+
+React's `componentDidCatch` only catches render-time errors. Use `useErrorBoundary` to route async or event-handler errors into the nearest boundary:
 
 ```tsx
 import { ErrorBoundary } from "react-rescuer";
+import { useErrorBoundary } from "react-rescuer/hooks";
 
-export const Demo = () => (
-  <ErrorBoundary
-    recovery={{
-      maxRetries: 3,
-      retryDelay: (attempt) => Math.min(1000, 200 * 2 ** (attempt - 1))
-    }}
-    fallbackRender={({ error, resetError, retryCount }) => (
-      <div>
-        <div>{error.message}</div>
-        <div>retryCount: {retryCount}</div>
-        <button type="button" onClick={resetError}>Retry</button>
-      </div>
-    )}
-  >
-    <Page />
-  </ErrorBoundary>
-);
+function SaveButton() {
+  const { showBoundary } = useErrorBoundary();
+
+  return (
+    <button
+      onClick={async () => {
+        try {
+          await api.save();
+        } catch (e) {
+          showBoundary(e as Error);
+        }
+      }}
+    >
+      Save
+    </button>
+  );
+}
+
+<ErrorBoundary fallback={<p>Save failed.</p>}>
+  <SaveButton />
+</ErrorBoundary>;
 ```
 
-</details>
+### HOC
 
----
+```tsx
+import { withErrorBoundary } from "react-rescuer/hoc";
 
-## API (quick view)
+const SafeWidget = withErrorBoundary(Widget, {
+  fallback: <p>Widget failed to load.</p>,
+});
+```
 
-Fallback props include:
+### Testing
 
-- `error`: the thrown `Error`
-- `errorContext`: structured context (fingerprint, breadcrumbs, componentStack, timestamp, sessionId, errorCount)
-- `resetError()`: resets the boundary (also dispatches `react-rescuer:reset` to clear breadcrumbs)
-- `retryCount`: retry counter (when using `recovery`)
+```tsx
+import { render } from "@testing-library/react";
+import { createTestBoundary, installMatchers } from "react-rescuer/testing";
 
-Reporting hook:
+installMatchers(); // adds toHaveCaughtError + toHaveCaughtErrorMatching to expect
+
+const tb = createTestBoundary();
+const { Boundary, getLastContext } = tb;
+
+function Bomb() {
+  throw new Error("boom");
+  return null;
+}
+
+render(
+  <Boundary>
+    <Bomb />
+  </Boundary>,
+);
+
+expect(tb).toHaveCaughtError();
+expect(tb).toHaveCaughtErrorMatching("boom");
+expect(getLastContext()?.fingerprint).toBeTruthy();
+```
+
+## Import paths
 
 ```ts
-onError?: (error, errorInfo, errorContext) => void
+import { ErrorBoundary } from "react-rescuer";
+import { withErrorBoundary } from "react-rescuer/hoc";
+import { useErrorBoundary, useErrorContext } from "react-rescuer/hooks";
+import { createTestBoundary, installMatchers } from "react-rescuer/testing";
+import { RetryManager, createExponentialBackoff } from "react-rescuer/recovery";
+import { addBreadcrumb, buildErrorContext, fingerprintError, getBreadcrumbTrail } from "react-rescuer/observability";
 ```
-
-Note: v0.1.0 does not ship official reporters. Use `onError` to integrate with any tool.
-
----
-
-## Playground (interactive demos)
-
-```bash
-pnpm install
-pnpm --filter playground dev
-```
-
----
 
 ## Contributing
 
-This repo uses:
-
-- PRs target `develop`
-- Conventional Commits
-- Strict policy: 1 file = 1 commit
-
-See `CONTRIBUTING.md`.
-
----
+Issues and PRs welcome. See the [repository](https://github.com/rody-huancas/react-rescuer) for setup instructions.
 
 ## License
 
-MIT
+MIT © [Rody Huancas](https://github.com/rody-huancas)
