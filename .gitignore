@@ -10,3 +10,5 @@ AGENTS.md
 CLAUDE.md
 CONTRIBUTING.md
 DOCUMENTATION.md
+
+packages/docs/.vitepress/cache
