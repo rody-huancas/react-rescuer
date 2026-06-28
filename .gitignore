@@ -4,6 +4,7 @@ dist
 coverage
 *.local
 *.tgz
+.vitepress/cache
 
 AGENTS.md
 CLAUDE.md
