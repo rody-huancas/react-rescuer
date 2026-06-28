@@ -6,7 +6,10 @@
     "build": "pnpm --filter react-rescuer build",
     "test": "pnpm --filter react-rescuer test",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "docs:dev": "pnpm --filter docs dev",
+    "docs:build": "pnpm --filter docs build",
+    "docs:preview": "pnpm --filter docs preview"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.0"

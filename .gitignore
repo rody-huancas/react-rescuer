@@ -4,8 +4,11 @@ dist
 coverage
 *.local
 *.tgz
+.vitepress/cache
 
 AGENTS.md
 CLAUDE.md
 CONTRIBUTING.md
 DOCUMENTATION.md
+
+packages/docs/.vitepress/cache
